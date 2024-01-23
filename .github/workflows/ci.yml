@@ -1,0 +1,57 @@
+name: Deploy to Remote Server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy to the remote server
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build & Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          DIRECTORY: rental-system-backend
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          port: 22
+          envs: DIRECTORY
+          script_stop: true
+          script: |
+            # Fix bug yarn not found
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+
+            # Remove the directory if it exists
+            if [ -d "$DIRECTORY" ]; then
+              rm -rf "$DIRECTORY"
+            fi
+
+            # Clone the repository
+            git clone https://github.com/bkrental/rental-system-backend.git "$DIRECTORY"
+            cd "$DIRECTORY"
+
+            # Config git
+            git config --global user.email "datdev2409@gmail.com"
+            git config --global user.name "remote-server"
+
+            git checkout master
+            git pull origin master
+
+            yarn --version
+            yarn install
+
+            chmod +x ./scripts/start.sh
+            ./scripts/start.sh
+
+            sudo cp ./nginx.conf /etc/nginx/nginx.conf
+            sudo systemctl restart nginx
+
+            yarn dev
