@@ -1,6 +1,6 @@
 const passport = require("passport");
 const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
-const userService = require("../services/user");
+const userService = require("../services/user.service");
 
 const protect = passport.authenticate("jwt", {
   session: false,

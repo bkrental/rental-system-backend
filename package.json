@@ -2,7 +2,8 @@
   "name": "backend",
   "packageManager": "yarn@3.3.1",
   "scripts": {
-    "dev": "NODE_ENV=local nodemon src/index.js"
+    "local": "docker-compose up -d && NODE_ENV=local nodemon src/index.js",
+    "dev": "NODE_ENV=dev pm2 start src/index.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -13,7 +14,8 @@
     "mongoose": "^8.1.0",
     "morgan": "^1.10.0",
     "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1"
+    "passport-jwt": "^4.0.1",
+    "pm2": "^5.3.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
