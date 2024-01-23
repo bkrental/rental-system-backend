@@ -1,7 +1,7 @@
-name: CI
+name: CD
 
 on:
-  pull_request:
+  push:
     branches:
       - master
 
@@ -9,7 +9,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: development
+    environment: production
 
     steps:
       - uses: actions/checkout@v3
@@ -44,7 +44,7 @@ jobs:
             yarn --version
             yarn install
 
-            sudo cp ./nginx.conf /etc/nginx/nginx.conf
+            sudo cp ./nginx.prod.conf /etc/nginx/nginx.conf
             sudo systemctl restart nginx
 
             yarn dev
