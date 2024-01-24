@@ -5,10 +5,11 @@ const dotenv = require("dotenv");
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 const db = require("./config/database");
-const { jwtStrategy, protect } = require("./middlewares/auth.middleware");
+const { jwtStrategy, protect } = require("./middlewares/authMiddleware");
+const errorHandler = require("./controllers/errorController");
 
 // Routes
-const authRoutes = require("./routes/auth.routes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 db.connect();
@@ -28,10 +29,7 @@ app.get("/", (req, res) => {
 });
 
 // Error handler
-app.use((err, req, res, next) => {
-  console.log(err);
-  res.status(500).send("Something wrong happened!");
-});
+app.use(errorHandler);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");

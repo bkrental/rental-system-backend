@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const userService = require("../services/userService");
-const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const wrapper = require("../utils/wrapper");
 
