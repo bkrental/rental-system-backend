@@ -17,18 +17,21 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         env:
           DIRECTORY: rental-system-backend
+          BRANCH: ${{github.head_ref}}
         with:
           host: ${{ vars.SSH_HOST }}
           username: ${{ vars.SSH_USER }}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           port: 22
-          envs: DIRECTORY
+          envs: DIRECTORY, BRANCH
           script_stop: true
           script: |
             # Remove the directory if it exists
             if [ -d "$DIRECTORY" ]; then
               rm -rf "$DIRECTORY"
             fi
+
+            echo $BRANCH
 
             # Clone the repository
             git clone https://github.com/bkrental/rental-system-backend.git "$DIRECTORY"
@@ -44,7 +47,7 @@ jobs:
             yarn --version
             yarn install
 
-            sudo cp ./nginx.conf /etc/nginx/nginx.conf
+            sudo cp ./nginx.dev.conf /etc/nginx/nginx.conf
             sudo systemctl restart nginx
 
             yarn dev
