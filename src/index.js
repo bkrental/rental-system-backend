@@ -23,9 +23,12 @@ passport.use(jwtStrategy);
 
 app.use("/auth", authRoutes);
 
-app.use(protect);
-app.get("/", (req, res) => {
+app.get("/", protect, (req, res) => {
   res.send("Hello World!!");
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
 });
 
 // Error handler
