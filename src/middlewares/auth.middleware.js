@@ -1,6 +1,6 @@
 const passport = require("passport");
 const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
-const userService = require("../services/userService");
+const userService = require("../services/user.service");
 
 const protect = passport.authenticate("jwt", {
   session: false,
@@ -19,7 +19,7 @@ const jwtStrategy = new JwtStrategy(jwtOptions, async (payload, done) => {
     return done(null, user);
   }
 
-  return done(null, false);
+  return done(new Error("User not found"), null);
 });
 
 module.exports = { jwtStrategy, protect };

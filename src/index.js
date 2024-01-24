@@ -8,8 +8,7 @@ const db = require("./config/database");
 const { jwtStrategy, protect } = require("./middlewares/auth.middleware");
 
 // Routes
-const authRoutes = require("./routes/authRoutes");
-const errorHandler = require("./controllers/errorController");
+const authRoutes = require("./routes/auth.routes");
 
 const app = express();
 db.connect();
@@ -29,7 +28,10 @@ app.get("/", (req, res) => {
 });
 
 // Error handler
-app.use(errorHandler);
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(500).send("Something wrong happened!");
+});
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
