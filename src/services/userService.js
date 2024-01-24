@@ -1,14 +1,18 @@
-const User = require("../models/user");
+const User = require("../models/userModel");
 
 const userService = {
   createUser: async (user) => {
-    const { firstName, lastName, email, password } = user;
-    const newUser = await User.create({ firstName, lastName, email, password });
+    const newUser = await User.create(user);
     return newUser;
   },
 
   getUserByEmail: async (email) => {
     const user = await User.findOne({ email });
+    return user;
+  },
+
+  getUserByPhone: async (phone) => {
+    const user = await User.findOne({ phone });
     return user;
   },
 

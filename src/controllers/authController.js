@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const userService = require("../services/user.service");
+const userService = require("../services/userService");
+const AppError = require("../utils/appError");
+const wrapper = require("../utils/wrapper");
 
 function generateToken(user) {
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
@@ -9,21 +11,22 @@ function generateToken(user) {
 
 const authController = {
   signUp: async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, phone } = req.body;
 
-    if (!firstName || !lastName || !email || !password) {
-      return res.status(400).send("Missing fields");
+    if (!firstName || !lastName || !phone || !email || !password) {
+      throw new AppError("Missing fields", 400);
     }
 
-    const existingUser = await userService.getUserByEmail(email);
+    const existingUser = await userService.getUserByPhone(phone);
     if (existingUser) {
-      return res.status(400).send("User already exists");
+      throw new AppError("User already exists", 400);
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
     const newUser = await userService.createUser({
       firstName,
       lastName,
+      phone,
       email,
       password: hashedPassword,
     });
@@ -35,27 +38,27 @@ const authController = {
   },
 
   login: async (req, res) => {
-    const { email, password } = req.body;
+    const { phone, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).send("Missing fields");
+    if (!phone || !password) {
+      throw new AppError("Missing fields", 400);
     }
 
-    const user = await userService.getUserByEmail(email);
+    const user = await userService.getUserByPhone(phone);
     if (!user) {
-      return res.status(400).send("User not found");
+      throw new AppError("User not found", 400);
     }
 
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).send("Invalid password");
+      throw new AppError("Invalid password", 400);
     }
 
-    res.json({
+    res.status(200).json({
       status: "success",
       access_token: generateToken(user),
     });
   },
 };
 
-module.exports = authController;
+module.exports = wrapper(authController);
