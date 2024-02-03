@@ -12,42 +12,41 @@ jobs:
     environment: production
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-southeast-1
+          role-to-assume: arn:aws:iam::239995296586:role/GitHubAction-SSMAdmin
+
+      - name: Retrieve App Secrets from AWS Parameter Store
+        uses: gsf/aws-params-env-action@v1
+        with:
+          params: |
+            APP_SECRETS=${{vars.APP_SECRETS_SSM_ARN}}
+
       - name: Build & Deploy
         uses: appleboy/ssh-action@v1.0.3
         env:
-          DIRECTORY: rental-system-backend
+          COMMIT_SHA: ${{github.sha}}
+          APP_SECRETS: ${{env.APP_SECRETS}}
         with:
           host: ${{ vars.SSH_HOST }}
           username: ${{ vars.SSH_USER }}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           port: 22
-          envs: DIRECTORY
+          envs: COMMIT_SHA, APP_SECRETS
           script_stop: true
           script: |
-            # Remove the directory if it exists
-            if [ -d "$DIRECTORY" ]; then
-              rm -rf "$DIRECTORY"
-            fi
+            # Create ENV file
+            rm -f .env.prod
+            echo "$APP_SECRETS" > .env.prod
 
-            # Clone the repository
-            git clone https://github.com/bkrental/rental-system-backend.git "$DIRECTORY"
-            cd "$DIRECTORY"
+            docker rm -f $(docker ps -a -q)
 
-            # Config git
-            git config --global user.email "datdev2409@gmail.com"
-            git config --global user.name "remote-server"
-
-            git checkout master
-            git pull origin master
-
-            yarn --version
-            yarn install
-
-            sudo cp ./nginx.prod.conf /etc/nginx/nginx.conf
-            sudo systemctl restart nginx
-
-            yarn prod
+            docker run -d --env-file .env.prod -p 3000:3000 congdat2409/rental-system-backend:$COMMIT_SHA
 
       - name: URL Health Check
         uses: jtalk/url-health-check-action@v3

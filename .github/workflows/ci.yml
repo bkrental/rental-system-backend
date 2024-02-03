@@ -59,6 +59,7 @@ jobs:
           key: ${{secrets.SSH_PRIVATE_KEY}}
           port: 22
           envs: COMMIT_SHA, APP_SECRETS
+          script_stop: true
           script: |
             # Create ENV file
             rm -f .env.dev
