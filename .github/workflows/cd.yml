@@ -66,7 +66,7 @@ jobs:
 
             docker rm -f $(docker ps -a -q)
 
-            docker run -d --env-file .env.prod -p 3000:3000 congdat2409/rental-system-backend:$COMMIT_SHA
+            docker run -d --env-file .env.prod -p 3000:3000 congdat2409/rental-system-backend:prod-$COMMIT_SHA
 
       - name: URL Health Check
         uses: jtalk/url-health-check-action@v3
