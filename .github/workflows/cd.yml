@@ -10,6 +10,23 @@ permissions:
   contents: read # This is required for actions/checkout
 
 jobs:
+  build:
+    name: Build & Push the Docker Image
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build the Docker Image
+        run: docker build -t congdat2409/rental-system-backend:prod-${{github.sha}} .
+
+      - name: Login to DockerHub
+        run: docker login -u ${{secrets.DOCKERHUB_USERNAME}} -p ${{secrets.DOCKERHUB_TOKEN}}
+
+      - name: Push image to DockerHub
+        run: docker push congdat2409/rental-system-backend:prod-${{github.sha}}
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
