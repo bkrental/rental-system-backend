@@ -10,11 +10,10 @@ permissions:
   contents: read # This is required for actions/checkout
 
 jobs:
-  deploy:
-    name: Deploy
+  init:
+    name: Init
     runs-on: ubuntu-latest
     environment: development
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,6 +30,17 @@ jobs:
           params: |
             APP_SECRETS=${{vars.APP_SECRETS_SSM_ARN}}
 
+    outputs:
+      APP_SECRETS: ${{ env.APP_SECRETS }}
+
+  build:
+    name: Build & Push the Docker Image
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Build the Docker Image
         run: docker build -t congdat2409/rental-system-backend:${{github.sha}} .
 
@@ -40,25 +50,30 @@ jobs:
       - name: Push image to DockerHub
         run: docker push congdat2409/rental-system-backend:${{github.sha}}
 
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: development
+    needs: [init, build]
+    steps:
       - uses: actions/checkout@v3
       - name: Build & Deploy
         uses: appleboy/ssh-action@v1.0.3
         env:
           COMMIT_SHA: ${{github.sha}}
-          APP_SECRETS: ${{env.APP_SECRETS}}
+          APP_SECRETS: ${{needs.init.outputs.APP_SECRETS}}
         with:
           host: ${{ vars.SSH_HOST }}
           username: ${{ vars.SSH_USER }}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           port: 22
           envs: COMMIT_SHA, APP_SECRETS
-          script_stop: true
           script: |
             # Create ENV file
             rm -f .env.dev
             echo "$APP_SECRETS" > .env.dev
 
-            kill -9 $(lsof -ti tcp:3000) # Kill port 3000 if it's running
+            kill -9 $(lsof -i tcp:3000) # Kill port 3000 if it's running
 
             docker run --env-file .env.dev -p 3000:3000 congdat2409/rental-system-backend:$COMMIT_SHA
 
