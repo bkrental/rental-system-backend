@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
 jobs:
   deploy:
     name: Deploy
@@ -12,18 +16,37 @@ jobs:
     environment: development
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-southeast-1
+          role-to-assume: arn:aws:iam::239995296586:role/GitHubAction-SSMAdmin
+
+      - name: Retrieve App Secrets from AWS Parameter Store
+        uses: gsf/aws-params-env-action@v1
+        with:
+          params: |
+            APP_SECRETS=${{vars.APP_SECRETS_SSM_ARN}}
+
+      - name: Verify App Secrets
+        run: echo ${{env.APP_SECRETS}}
+
       - uses: actions/checkout@v3
       - name: Build & Deploy
         uses: appleboy/ssh-action@v1.0.3
         env:
           DIRECTORY: rental-system-backend
           BRANCH: ${{github.head_ref}}
+          APP_SECRETS: ${{env.APP_SECRETS}}
         with:
           host: ${{ vars.SSH_HOST }}
           username: ${{ vars.SSH_USER }}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           port: 22
-          envs: DIRECTORY, BRANCH
+          envs: DIRECTORY, BRANCH, APP_SECRETS
           script_stop: true
           script: |
             # Remove the directory if it exists
@@ -49,6 +72,10 @@ jobs:
 
             sudo cp ./nginx.dev.conf /etc/nginx/nginx.conf
             sudo systemctl restart nginx
+
+            # Create ENV file
+            rm -f .env.dev
+            echo "$APP_SECRETS" > .env.dev
 
             yarn dev
 
