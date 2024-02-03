@@ -44,39 +44,23 @@ jobs:
       - name: Build & Deploy
         uses: appleboy/ssh-action@v1.0.3
         env:
-          DIRECTORY: rental-system-backend
-          BRANCH: ${{github.head_ref}}
+          COMMIT_SHA: ${{github.sha}}
           APP_SECRETS: ${{env.APP_SECRETS}}
         with:
           host: ${{ vars.SSH_HOST }}
           username: ${{ vars.SSH_USER }}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           port: 22
-          envs: DIRECTORY, BRANCH, APP_SECRETS
+          envs: COMMIT_SHA, APP_SECRETS
           script_stop: true
           script: |
-            # Remove the directory if it exists
-            if [ -d "$DIRECTORY" ]; then
-              rm -rf "$DIRECTORY"
-            fi
-
-            echo $BRANCH
-
-            # Clone the repository
-            git clone --branch "$BRANCH" https://github.com/bkrental/rental-system-backend.git "$DIRECTORY"
-            cd "$DIRECTORY"
-
-            yarn --version
-            yarn install
-
-            sudo cp ./nginx.dev.conf /etc/nginx/nginx.conf
-            sudo systemctl restart nginx
-
             # Create ENV file
             rm -f .env.dev
             echo "$APP_SECRETS" > .env.dev
 
-            yarn dev
+            kill -9 $(lsof -ti tcp:3000) # Kill port 3000 if it's running
+
+            docker run --env-file .env.dev -p 3000:3000 congdat2409/rental-system-backend:$COMMIT_SHA
 
       - name: URL Health Check
         uses: jtalk/url-health-check-action@v3
