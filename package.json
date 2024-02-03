@@ -2,9 +2,8 @@
   "name": "backend",
   "packageManager": "yarn@3.3.1",
   "scripts": {
-    "local": "docker-compose up -d && NODE_ENV=local nodemon src/index.js",
-    "dev": "pm2 delete all && NODE_ENV=dev pm2 start -f src/index.js",
-    "prod": "pm2 delete all && NODE_ENV=prod pm2 start -f src/index.js"
+    "start": "node src/index.js",
+    "local": "docker-compose -f ./local/docker-compose.yml up -d && NODE_ENV=local nodemon src/index.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -20,5 +19,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
-  }
+  },
+  "license": "MIT"
 }

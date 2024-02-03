@@ -5,52 +5,68 @@ on:
     branches:
       - master
 
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
 jobs:
+  build:
+    name: Build & Push the Docker Image
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build the Docker Image
+        run: docker build -t congdat2409/rental-system-backend:${{github.sha}} .
+
+      - name: Login to DockerHub
+        run: docker login -u ${{secrets.DOCKERHUB_USERNAME}} -p ${{secrets.DOCKERHUB_TOKEN}}
+
+      - name: Push image to DockerHub
+        run: docker push congdat2409/rental-system-backend:${{github.sha}}
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     environment: development
-
+    needs: build
     steps:
-      - uses: actions/checkout@v3
-      - name: Build & Deploy
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-southeast-1
+          role-to-assume: arn:aws:iam::239995296586:role/GitHubAction-SSMAdmin
+
+      - name: Retrieve App Secrets from AWS Parameter Store
+        uses: gsf/aws-params-env-action@v1
+        with:
+          params: |
+            APP_SECRETS=${{vars.APP_SECRETS_SSM_ARN}}
+
+      - name: Deploy
         uses: appleboy/ssh-action@v1.0.3
         env:
-          DIRECTORY: rental-system-backend
-          BRANCH: ${{github.head_ref}}
+          COMMIT_SHA: ${{github.sha}}
+          APP_SECRETS: ${{env.APP_SECRETS}}
         with:
           host: ${{ vars.SSH_HOST }}
           username: ${{ vars.SSH_USER }}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           port: 22
-          envs: DIRECTORY, BRANCH
-          script_stop: true
+          envs: COMMIT_SHA, APP_SECRETS
           script: |
-            # Remove the directory if it exists
-            if [ -d "$DIRECTORY" ]; then
-              rm -rf "$DIRECTORY"
-            fi
+            # Create ENV file
+            rm -f .env.dev
+            echo "$APP_SECRETS" > .env.dev
 
-            echo $BRANCH
+            docker rm -f $(docker ps -a -q)
 
-            # Clone the repository
-            git clone https://github.com/bkrental/rental-system-backend.git "$DIRECTORY"
-            cd "$DIRECTORY"
-
-            # Config git
-            git config --global user.email "datdev2409@gmail.com"
-            git config --global user.name "remote-server"
-
-            git checkout -b "$BRANCH"
-            git pull origin "$BRANCH"
-
-            yarn --version
-            yarn install
-
-            sudo cp ./nginx.dev.conf /etc/nginx/nginx.conf
-            sudo systemctl restart nginx
-
-            yarn dev
+            docker run -d --env-file .env.dev -p 3000:3000 congdat2409/rental-system-backend:$COMMIT_SHA
 
       - name: URL Health Check
         uses: jtalk/url-health-check-action@v3
