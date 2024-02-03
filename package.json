@@ -3,9 +3,7 @@
   "packageManager": "yarn@3.3.1",
   "scripts": {
     "start": "node src/index.js",
-    "local": "docker-compose up -d && NODE_ENV=local nodemon src/index.js",
-    "dev": "NODE_ENV=dev node src/index.js",
-    "prod": "NODE_ENV=prod node src/index.js"
+    "local": "docker-compose -f ./local/docker-compose.yml up -d && NODE_ENV=local nodemon src/index.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
