@@ -25,6 +25,25 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       select: false,
     },
+    favourites: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
+    rating: {
+      score: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5,
+      },
+      count: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+    },
   },
   {
     timestamps: true,
