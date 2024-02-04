@@ -1,8 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const userService = require("../services/userService");
 const AppError = require("../utils/appError");
 const wrapper = require("../utils/wrapper");
+const User = require("../models/userModel");
 
 function generateToken(user) {
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
@@ -11,21 +11,20 @@ function generateToken(user) {
 
 const authController = {
   signUp: async (req, res) => {
-    const { firstName, lastName, email, password, phone } = req.body;
+    const { name, email, password, phone } = req.body;
 
-    if (!firstName || !lastName || !phone || !email || !password) {
+    if (!name || !phone || !email || !password) {
       throw new AppError("Missing fields", 400);
     }
 
-    const existingUser = await userService.getUserByPhone(phone);
+    const existingUser = await User.findOne({ phone });
     if (existingUser) {
       throw new AppError("User already exists", 400);
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const newUser = await userService.createUser({
-      firstName,
-      lastName,
+    const newUser = await User.create({
+      name,
       phone,
       email,
       password: hashedPassword,
@@ -44,7 +43,7 @@ const authController = {
       throw new AppError("Missing fields", 400);
     }
 
-    const user = await userService.getUserByPhone(phone);
+    const user = await User.findOne({ phone }).select("+password");
     if (!user) {
       throw new AppError("User not found", 400);
     }
