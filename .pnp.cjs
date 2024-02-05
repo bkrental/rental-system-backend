@@ -31,8 +31,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-s3", "npm:3.504.0"],\
             ["@aws-sdk/lib-storage", "virtual:f5126a6c59718fab632a5fe9c89dad727d14c0854924da0278c36945a50e100550614ee30506e48e5221c7c36dc5ebab4a104a63756e8b71f6e37453259fec8c#npm:3.504.0"],\
             ["bcrypt", "npm:5.1.1"],\
+            ["cors", "npm:2.8.5"],\
             ["dotenv", "npm:16.3.2"],\
             ["express", "npm:4.18.2"],\
+            ["helmet", "npm:7.1.0"],\
             ["jsonwebtoken", "npm:9.0.2"],\
             ["lodash", "npm:4.17.21"],\
             ["mongoose", "npm:8.1.0"],\
@@ -1951,8 +1953,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-s3", "npm:3.504.0"],\
             ["@aws-sdk/lib-storage", "virtual:f5126a6c59718fab632a5fe9c89dad727d14c0854924da0278c36945a50e100550614ee30506e48e5221c7c36dc5ebab4a104a63756e8b71f6e37453259fec8c#npm:3.504.0"],\
             ["bcrypt", "npm:5.1.1"],\
+            ["cors", "npm:2.8.5"],\
             ["dotenv", "npm:16.3.2"],\
             ["express", "npm:4.18.2"],\
+            ["helmet", "npm:7.1.0"],\
             ["jsonwebtoken", "npm:9.0.2"],\
             ["lodash", "npm:4.17.21"],\
             ["mongoose", "npm:8.1.0"],\
@@ -2377,6 +2381,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/core-util-is-npm-1.0.3-ca74b76c90-9de8597363.zip/node_modules/core-util-is/",\
           "packageDependencies": [\
             ["core-util-is", "npm:1.0.3"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["cors", [\
+        ["npm:2.8.5", {\
+          "packageLocation": "./.yarn/cache/cors-npm-2.8.5-c9935a2d12-ced838404c.zip/node_modules/cors/",\
+          "packageDependencies": [\
+            ["cors", "npm:2.8.5"],\
+            ["object-assign", "npm:4.1.1"],\
+            ["vary", "npm:1.1.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -3196,6 +3211,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["hasown", "npm:2.0.0"],\
             ["function-bind", "npm:1.1.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["helmet", [\
+        ["npm:7.1.0", {\
+          "packageLocation": "./.yarn/cache/helmet-npm-7.1.0-0f9f70fa93-16aaa0df99.zip/node_modules/helmet/",\
+          "packageDependencies": [\
+            ["helmet", "npm:7.1.0"]\
           ],\
           "linkType": "HARD"\
         }]\
