@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
@@ -25,12 +26,15 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       select: false,
     },
-    favourites: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
+    favourites: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Post",
+        },
+      ],
+      default: [],
+    },
     rating: {
       score: {
         type: Number,
@@ -49,6 +53,17 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = bcrypt.hashSync(this.password, 10);
+  next();
+});
+
+userSchema.methods.comparePassword = function (plainPassword) {
+  return bcrypt.compareSync(plainPassword, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 

@@ -1,4 +1,3 @@
-const e = require("express");
 const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema({
@@ -12,7 +11,6 @@ const postSchema = new mongoose.Schema({
   },
   area: {
     type: Number,
-    required: true,
   },
   property_type: {
     type: String,
@@ -50,7 +48,11 @@ const postSchema = new mongoose.Schema({
     },
   },
   location: {
-    type: "Point",
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
     coordinates: [Number],
   },
 

@@ -11,28 +11,11 @@ function generateToken(user) {
 
 const authController = {
   signUp: async (req, res) => {
-    const { name, email, password, phone } = req.body;
-
-    if (!name || !phone || !email || !password) {
-      throw new AppError("Missing fields", 400);
-    }
-
-    const existingUser = await User.findOne({ phone });
-    if (existingUser) {
-      throw new AppError("User already exists", 400);
-    }
-
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    const newUser = await User.create({
-      name,
-      phone,
-      email,
-      password: hashedPassword,
-    });
+    const user = await User.create(req.body);
 
     res.status(201).json({
       status: "success",
-      access_token: generateToken(newUser),
+      access_token: generateToken(user),
     });
   },
 
@@ -44,13 +27,9 @@ const authController = {
     }
 
     const user = await User.findOne({ phone }).select("+password");
-    if (!user) {
-      throw new AppError("User not found", 400);
-    }
 
-    const isPasswordValid = bcrypt.compareSync(password, user.password);
-    if (!isPasswordValid) {
-      throw new AppError("Invalid password", 400);
+    if (!user || !user.comparePassword(password)) {
+      throw new AppError("Incorect phone or password", 400);
     }
 
     res.status(200).json({

@@ -8,9 +8,6 @@ const db = require("./config/database");
 const { jwtStrategy, protect } = require("./middlewares/authMiddleware");
 const errorHandler = require("./controllers/errorController");
 
-// Routes
-const authRoutes = require("./routes/authRoutes");
-
 const app = express();
 db.connect();
 
@@ -21,7 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 passport.use(jwtStrategy);
 
-app.use("/auth", authRoutes);
+app.use("/auth", require("./routes/authRoutes"));
+app.use("/posts", require("./routes/postRoutes"));
 
 app.get("/", protect, (req, res) => {
   res.send("Hello World!!");
