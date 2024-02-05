@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const AppError = require("../utils/appError");
@@ -15,7 +16,10 @@ const authController = {
 
     res.status(201).json({
       status: "success",
-      access_token: generateToken(user),
+      data: {
+        access_token: generateToken(user),
+        user: user,
+      },
     });
   },
 
@@ -34,7 +38,10 @@ const authController = {
 
     res.status(200).json({
       status: "success",
-      access_token: generateToken(user),
+      data: {
+        access_token: generateToken(user),
+        user: _.pick(user, ["name", "email", "phone"]),
+      },
     });
   },
 };
