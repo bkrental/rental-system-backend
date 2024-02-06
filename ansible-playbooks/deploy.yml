@@ -1,0 +1,31 @@
+---
+- name: Deploy the backend application
+  hosts: all
+  become: true
+  remote_user: congdat
+  vars:
+    env: "dev"
+    backend_image: ""
+    env_file_path: ""
+
+  tasks:
+    - name: Store the app_secrets to .env file
+      ansible.builtin.copy:
+        src: "{{ env_file_path }}"
+        dest: /home/congdat/.env.{{ env }}
+        owner: congdat
+        mode: "0644"
+
+    - name: Create a backend container
+      community.docker.docker_container:
+        name: backend
+        image: "{{ backend_image }}"
+        ports:
+          - "3000:3000"
+        env_file: "/home/congdat/.env.{{ env }}"
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+          interval: 30s
+          retries: 3
+          start_period: 30s
+          timeout: 30s
