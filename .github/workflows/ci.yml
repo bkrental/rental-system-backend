@@ -48,29 +48,19 @@ jobs:
           params: |
             APP_SECRETS=${{vars.APP_SECRETS_SSM_ARN}}
 
-      - name: Deploy
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          COMMIT_SHA: ${{github.sha}}
-          APP_SECRETS: ${{env.APP_SECRETS}}
+      - name: Store App Secrets as Environment Variables
+        id: store-secrets
+        run: |
+          rm -f .env.dev
+          echo "$APP_SECRETS" > .env.dev
+
+      - name: Deploy service
+        uses: dawidd6/action-ansible-playbook@v2
         with:
-          host: ${{ vars.SSH_HOST }}
-          username: ${{ vars.SSH_USER }}
+          directory: ./scripts
+          playbook: deploy.yml
           key: ${{secrets.SSH_PRIVATE_KEY}}
-          port: 22
-          envs: COMMIT_SHA, APP_SECRETS
-          script: |
-            # Create ENV file
-            rm -f .env.dev
-            echo "$APP_SECRETS" > .env.dev
-
-            docker rm -f $(docker ps -a -q)
-
-            docker run -d --env-file .env.dev -p 3000:3000 congdat2409/rental-system-backend:$COMMIT_SHA
-
-      - name: URL Health Check
-        uses: jtalk/url-health-check-action@v3
-        with:
-          url: https://dev-backend.datnguyen2409.me/health
-          max-attempts: 3
-          retry-delay: 10s
+          inventory: |
+            34.125.207.204
+          options: |
+            --extra-vars "backend_image=congdat2409/rental-system-backend:${{github.sha}} env=dev"
