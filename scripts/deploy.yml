@@ -5,7 +5,7 @@
   remote_user: congdat
   vars:
     env: "dev"
-    backend_image: ""
+    container_image: ""
 
   tasks:
     - name: Store the app_secrets to .env file
@@ -19,7 +19,7 @@
     - name: Create a backend container
       community.docker.docker_container:
         name: backend
-        image: "{{ backend_image }}"
+        image: "{{ container_image }}"
         ports:
           - "3000:3000"
         env_file: "/home/congdat/.env.{{ env }}"

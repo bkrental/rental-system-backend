@@ -9,6 +9,9 @@ permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
 
+env:
+  DOCKERHUB_REPO: congdat2409/rental-service-backend
+
 jobs:
   build:
     name: Build & Push the Docker Image
@@ -19,13 +22,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build the Docker Image
-        run: docker build -t congdat2409/rental-system-backend:prod-${{github.sha}} .
+        run: docker build -t ${{env.DOCKERHUB_REPO}}:prod-${{github.sha}} .
 
       - name: Login to DockerHub
         run: docker login -u ${{secrets.DOCKERHUB_USERNAME}} -p ${{secrets.DOCKERHUB_TOKEN}}
 
       - name: Push image to DockerHub
-        run: docker push congdat2409/rental-system-backend:prod-${{github.sha}}
+        run: docker push ${{env.DOCKERHUB_REPO}}:prod-${{github.sha}}
 
   deploy:
     name: Deploy
@@ -64,4 +67,4 @@ jobs:
           inventory: |
             34.16.189.213
           options: |
-            --extra-vars "backend_image=congdat2409/rental-system-backend:prod-${{github.sha}} env=prod"
+            --extra-vars "container_image=${{env.DOCKERHUB_REPO}}:prod-${{github.sha}} env=prod"
