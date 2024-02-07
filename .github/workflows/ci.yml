@@ -47,7 +47,7 @@ jobs:
         with:
           params: |
             APP_SECRETS=${{vars.APP_SECRETS_SSM_ARN}}
-      
+
       - name: Store App Secrets as Environment Variables
         id: store-secrets
         run: |
@@ -57,11 +57,10 @@ jobs:
       - name: Deploy service
         uses: dawidd6/action-ansible-playbook@v2
         with:
-          directory: ./ansible-playbooks
+          directory: ./scripts
           playbook: deploy.yml
           key: ${{secrets.SSH_PRIVATE_KEY}}
           inventory: |
-            [dev]
-            34.16.163.27
+            34.125.207.204
           options: |
-            --extra-vars "backend_image=congdat2409/rental-system-backend:${{github.sha}} env_file_path=../.env.dev env=dev"
+            --extra-vars "backend_image=congdat2409/rental-system-backend:${{github.sha}} env=dev"

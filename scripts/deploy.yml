@@ -6,15 +6,15 @@
   vars:
     env: "dev"
     backend_image: ""
-    env_file_path: ""
 
   tasks:
     - name: Store the app_secrets to .env file
       ansible.builtin.copy:
-        src: "{{ env_file_path }}"
+        src: "../.env.{{ env }}"
         dest: /home/congdat/.env.{{ env }}
         owner: congdat
         mode: "0644"
+        backup: true
 
     - name: Create a backend container
       community.docker.docker_container:
