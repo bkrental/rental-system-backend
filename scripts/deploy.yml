@@ -5,21 +5,21 @@
   remote_user: congdat
   vars:
     env: "dev"
-    backend_image: ""
-    env_file_path: ""
+    container_image: ""
 
   tasks:
     - name: Store the app_secrets to .env file
       ansible.builtin.copy:
-        src: "{{ env_file_path }}"
+        src: "../.env.{{ env }}"
         dest: /home/congdat/.env.{{ env }}
         owner: congdat
         mode: "0644"
+        backup: true
 
     - name: Create a backend container
       community.docker.docker_container:
         name: backend
-        image: "{{ backend_image }}"
+        image: "{{ container_image }}"
         ports:
           - "3000:3000"
         env_file: "/home/congdat/.env.{{ env }}"

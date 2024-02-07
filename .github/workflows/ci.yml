@@ -9,6 +9,9 @@ permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
 
+env:
+  DOCKERHUB_REPO: congdat2409/rental-service-backend
+
 jobs:
   build:
     name: Build & Push the Docker Image
@@ -19,13 +22,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build the Docker Image
-        run: docker build -t congdat2409/rental-system-backend:${{github.sha}} .
+        run: docker build -t ${{env.DOCKERHUB_REPO}}:${{github.sha}} .
 
       - name: Login to DockerHub
         run: docker login -u ${{secrets.DOCKERHUB_USERNAME}} -p ${{secrets.DOCKERHUB_TOKEN}}
 
       - name: Push image to DockerHub
-        run: docker push congdat2409/rental-system-backend:${{github.sha}}
+        run: docker push ${{env.DOCKERHUB_REPO}}:${{github.sha}}
 
   deploy:
     name: Deploy
@@ -47,7 +50,7 @@ jobs:
         with:
           params: |
             APP_SECRETS=${{vars.APP_SECRETS_SSM_ARN}}
-      
+
       - name: Store App Secrets as Environment Variables
         id: store-secrets
         run: |
@@ -57,11 +60,10 @@ jobs:
       - name: Deploy service
         uses: dawidd6/action-ansible-playbook@v2
         with:
-          directory: ./ansible-playbooks
+          directory: ./scripts
           playbook: deploy.yml
           key: ${{secrets.SSH_PRIVATE_KEY}}
           inventory: |
-            [dev]
-            34.16.163.27
+            34.125.207.204
           options: |
-            --extra-vars "backend_image=congdat2409/rental-system-backend:${{github.sha}} env_file_path=../.env.dev env=dev"
+            --extra-vars "container_image=${{env.DOCKERHUB_REPO}}:${{github.sha}} env=dev"
