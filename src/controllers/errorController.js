@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const _ = require("lodash");
 const AppError = require("../utils/appError");
 
 // MongoDB Error Handling
@@ -44,19 +44,18 @@ function sendErrorDev(err, req, res) {
   });
 }
 
-function errorHandler(err, req, res, next) {
-  if (err.name === "CastError") err = handleCastErrorDB(err);
-  if (err.code === 11000) err = handleDuplicateFieldsDB(err);
-  if (err.name === "ValidationError") err = handleValidationErrorDB(err);
+function errorHandler(err, req, res, _next) {
+  let appError = _.merge({ statusCode: 500, status: "error" }, err);
 
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || "error";
+  if (err.name === "CastError") appError = handleCastErrorDB(err);
+  if (err.code === 11000) appError = handleDuplicateFieldsDB(err);
+  if (err.name === "ValidationError") appError = handleValidationErrorDB(err);
 
-  if (process.env.NODE_ENV == "prod") {
-    return sendErrorProd(err, req, res);
+  if (process.env.NODE_ENV === "prod") {
+    return sendErrorProd(appError, req, res);
   }
 
-  return sendErrorDev(err, req, res);
+  return sendErrorDev(appError, req, res);
 }
 
 module.exports = errorHandler;
