@@ -64,6 +64,6 @@ jobs:
           playbook: deploy.yml
           key: ${{secrets.SSH_PRIVATE_KEY}}
           inventory: |
-            34.125.207.204
+            ${{vars.DEV_INSTANCES_IP}}
           options: |
             --extra-vars "container_image=${{env.DOCKERHUB_REPO}}:${{github.sha}} env=dev"
