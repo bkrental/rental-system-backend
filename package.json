@@ -5,7 +5,7 @@
     "prepare": "husky",
     "start": "node src/index.js",
     "local": "docker-compose -f ./local/docker-compose.yml up -d && NODE_ENV=local nodemon src/index.js",
-    "lint": "prettier . --write && eslint . --ext .js --fix"
+    "lint": "lint-staged"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.504.0",
@@ -38,6 +38,13 @@
     "prettier": "^3.2.5"
   },
   "eslintConfig": {
+    "extends": [
+      "airbnb-base",
+      "prettier"
+    ],
+    "plugins": [
+      "prettier"
+    ],
     "rules": {
       "prettier/prettier": [
         "error"
@@ -52,14 +59,7 @@
           "caughtErrorsIgnorePattern": "^_"
         }
       ]
-    },
-    "extends": [
-      "airbnb-base",
-      "prettier"
-    ],
-    "plugins": [
-      "prettier"
-    ]
+    }
   },
   "lint-staged": {
     "*.js": [
