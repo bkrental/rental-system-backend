@@ -1,7 +1,7 @@
+const { v4: uuidv4 } = require("uuid");
 const wrapper = require("../utils/wrapper");
 const sendResponse = require("../utils/sendResponse");
 const uploadFileToS3 = require("../services/s3Service");
-const { v4: uuidv4 } = require("uuid");
 
 const imageController = {
   storeSingle: async (req, res) => {
