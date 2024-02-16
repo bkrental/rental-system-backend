@@ -66,4 +66,4 @@ const updatePostSchema = {
   additionalProperties: false,
 };
 
-module.exports = { createPostSchema, updatePostSchema };
+module.exports = { createPostSchema, updatePostSchema, createPostBulkSchema };

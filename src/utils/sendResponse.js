@@ -1,7 +1,6 @@
-function sendResponse(res, data, statusCode = 200, customFields = {}) {
+function sendResponse(res, data, statusCode = 200) {
   return res.status(statusCode).json({
     status: "success",
-    ...customFields,
     data,
   });
 }

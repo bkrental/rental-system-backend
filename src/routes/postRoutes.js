@@ -7,7 +7,11 @@ router.get("/", postController.getPosts);
 
 router.get("/me", protect, postController.getMyPosts);
 
-router.post("/bulk", postController.createPostBulk);
+router.post(
+  "/bulk",
+  bodyValidator("createPostBulk"),
+  postController.createPostBulk
+);
 
 router.post(
   "/",

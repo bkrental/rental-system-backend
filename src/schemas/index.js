@@ -1,18 +1,20 @@
+const fs = require("fs");
 const Ajv = require("ajv");
-const { loginSchema, signUpSchema } = require("./authSchema");
-const { createPostSchema, updatePostSchema } = require("./postSchema");
 const ajv = new Ajv();
 
-// The list of schemas to be added to the ajv instance
-const schemas = {
-  signUp: signUpSchema,
-  login: loginSchema,
-  createPost: createPostSchema,
-  updatePost: updatePostSchema,
-};
+const removeSchemaPostfix = (key) =>
+  key.endsWith("Schema") ? key.slice(0, -6) : key;
+
+const schemas = fs
+  .readdirSync(__dirname)
+  .filter((file) => file.endsWith("Schema.js"))
+  .reduce((schemas, file) => {
+    const schema = require(`./${file}`);
+    return { ...schemas, ...schema };
+  }, {});
 
 for (const key in schemas) {
-  ajv.addSchema(schemas[key], key);
+  ajv.addSchema(schemas[key], removeSchemaPostfix(key));
 }
 
 module.exports = ajv;
