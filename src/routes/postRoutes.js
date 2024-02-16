@@ -5,11 +5,24 @@ const bodyValidator = require("../middlewares/bodyValidator");
 
 router.get("/", postController.getPosts);
 
-router
-  .use(protect)
-  .get("/me", postController.getMyPosts)
-  .post("/", bodyValidator("createPost"), postController.createPost)
-  .patch("/:id", bodyValidator("updatePost"), postController.updatePost)
-  .delete("/:id", postController.deletePost);
+router.get("/me", protect, postController.getMyPosts);
+
+router.post("/bulk", postController.createPostBulk);
+
+router.post(
+  "/",
+  protect,
+  bodyValidator("createPost"),
+  postController.createPost
+);
+
+router.patch(
+  "/:id",
+  protect,
+  bodyValidator("updatePost"),
+  postController.updatePost
+);
+
+router.delete("/:id", protect, postController.deletePost);
 
 module.exports = router;

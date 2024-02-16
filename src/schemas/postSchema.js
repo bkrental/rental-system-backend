@@ -55,6 +55,11 @@ const createPostSchema = {
   additionalProperties: false,
 };
 
+const createPostBulkSchema = {
+  type: "array",
+  items: createPostSchema,
+};
+
 const updatePostSchema = {
   ...postSchema,
   required: [],
