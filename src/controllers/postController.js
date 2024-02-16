@@ -9,7 +9,7 @@ const postController = {
   getPosts: async (req, res) => {
     const posts = await postService.getPosts(req.query);
 
-    sendResponse(res, posts, 200);
+    sendResponse(res, { length: posts.length, posts }, 200);
   },
 
   getMyPosts: async (req, res) => {
@@ -17,13 +17,19 @@ const postController = {
 
     const posts = await postService.getPosts(req.query, { owner: userId });
 
-    sendResponse(res, posts, 200);
+    sendResponse(res, { length: posts.length, posts }, 200);
   },
 
   createPost: async (req, res) => {
     const post = await Post.create(req.body);
 
-    sendResponse(res, post, 201);
+    sendResponse(res, { post }, 201);
+  },
+
+  createPostBulk: async (req, res) => {
+    const posts = await Post.insertMany(req.body);
+
+    sendResponse(res, { length: posts.length, posts }, 201);
   },
 
   updatePost: async (req, res) => {
@@ -41,7 +47,7 @@ const postController = {
     const updatedPost = _.merge(post, req.body);
     await updatedPost.save();
 
-    sendResponse(res, updatedPost, 200);
+    sendResponse(res, { posts: updatedPost }, 200);
   },
 
   deletePost: async (req, res) => {
