@@ -6,6 +6,12 @@ const wrapper = require("../utils/wrapper");
 const sendResponse = require("../utils/sendResponse");
 
 const postController = {
+  getPost: async (req, res) => {
+    const post = await Post.findById(req.params.id);
+
+    sendResponse(res, { post }, 200);
+  },
+
   getPosts: async (req, res) => {
     const posts = await postService.getPosts(req.query);
 
@@ -21,7 +27,9 @@ const postController = {
   },
 
   createPost: async (req, res) => {
-    const post = await Post.create(req.body);
+    const userId = req.user.id;
+
+    const post = await Post.create(Object.assign(req.body, { owner: userId }));
 
     sendResponse(res, { post }, 201);
   },

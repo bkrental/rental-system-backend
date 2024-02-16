@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema(
         min: 0,
       },
     },
+    avatar: {
+      type: String,
+      default: "https://via.placeholder.com/150",
+    },
   },
   {
     timestamps: true,

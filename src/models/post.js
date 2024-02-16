@@ -4,6 +4,7 @@ const postSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
   },
   description: {
     type: String,
@@ -71,6 +72,16 @@ const postSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+});
+
+// Populate owner field
+postSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "owner",
+    select: "name email avatar",
+  });
+
+  next();
 });
 
 const Post = mongoose.model("Post", postSchema);
