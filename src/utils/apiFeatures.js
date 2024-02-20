@@ -6,7 +6,7 @@ class APIFeatures {
 
   filter() {
     const queryObj = { ...this.queryString };
-    const excludedFields = ["page", "sort", "limit", "fields"];
+    const excludedFields = ["page", "sort", "limit", "fields", "q"];
     excludedFields.forEach((el) => delete queryObj[el]);
 
     // 1B) Advanced filtering
@@ -14,6 +14,21 @@ class APIFeatures {
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
     this.query = this.query.find(JSON.parse(queryStr));
+
+    return this;
+  }
+
+  searchByKeyword(fields, keywordField = "q") {
+    const keyword = this.queryString[keywordField];
+    if (keyword) {
+      this.query = this.query.find({
+        $or: fields.map((field) => ({
+          [field]: {
+            $regex: new RegExp(keyword, "i"),
+          },
+        })),
+      });
+    }
 
     return this;
   }

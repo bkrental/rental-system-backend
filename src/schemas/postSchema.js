@@ -19,6 +19,15 @@ const locationSchema = {
   required: ["type", "coordinates"],
 };
 
+const contactSchema = {
+  type: "object",
+  properties: {
+    name: { type: "string" },
+    phone: { type: "string" },
+  },
+  required: ["name", "phone"],
+};
+
 const postSchema = {
   type: "object",
   properties: {
@@ -38,6 +47,9 @@ const postSchema = {
     bedrooms: { type: "number" },
     bathrooms: { type: "number" },
     owner: { type: "string" },
+    contact: contactSchema,
+    post_url: { type: "string" },
+    source: { type: "string" },
   },
 };
 
