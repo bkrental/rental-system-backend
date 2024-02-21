@@ -7,6 +7,8 @@ router.get("/", postController.getPosts);
 
 router.get("/me", protect, postController.getMyPosts);
 
+router.get("/:id", postController.getPost);
+
 router.post(
   "/bulk",
   bodyValidator("createPostBulk"),

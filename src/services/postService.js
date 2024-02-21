@@ -7,7 +7,8 @@ const postService = {
       .filter()
       .sort()
       .limitFields()
-      .paginate();
+      .paginate()
+      .searchByKeyword(["name", "description"]);
 
     const posts = await query.query;
 
