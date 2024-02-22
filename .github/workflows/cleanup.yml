@@ -1,0 +1,19 @@
+name: Clean Up
+
+on:
+  schedule:
+    - cron: "59 23 * * *"
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean up Docker images, networks and volumes
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          directory: ./scripts
+          playbook: clean_up.yml
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          inventory: |
+            ${{vars.DEV_INSTANCES_IP}}
+            ${{vars.PROD_INSTANCES_IP}}
