@@ -3,6 +3,7 @@ const Post = require("../models/post");
 const postService = require("../services/postService");
 const AppError = require("../utils/appError");
 const wrapper = require("../utils/wrapper");
+const getLocationQueryObj = require("../utils/getLocationQueryObj");
 const sendResponse = require("../utils/sendResponse");
 
 const postController = {
@@ -12,18 +13,23 @@ const postController = {
     sendResponse(res, { post }, 200);
   },
 
-  getPosts: async (req, res) => {
-    const posts = await postService.getPosts(req.query);
-
-    sendResponse(res, { length: posts.length, posts }, 200);
-  },
-
   getMyPosts: async (req, res) => {
     const userId = req.user.id;
 
     const posts = await postService.getPosts(req.query, { owner: userId });
 
     sendResponse(res, { length: posts.length, posts }, 200);
+  },
+
+  getPosts: async (req, res) => {
+    const queryObj = {
+      ...(_.omit(req.query, ["center", "distance", "unit"])),
+      ...getLocationQueryObj(req.query)
+    }
+
+    const posts = await postService.getPosts(queryObj);
+
+    sendResponse(res, { length: posts.length, posts: posts }, 200);
   },
 
   createPost: async (req, res) => {
