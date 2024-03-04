@@ -4,8 +4,9 @@ const getRadius = (distance, unit) => {
     mi: 3963.2,
     m: 6378100,
   }
+  let divider = dividerMapping[unit] ? dividerMapping[unit] : dividerMapping['km'];
 
-  return distance / dividerMapping[unit];
+  return distance / divider;
 }
 
 module.exports = getRadius;
