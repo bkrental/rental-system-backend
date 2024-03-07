@@ -1,31 +1,33 @@
 const router = require("express").Router();
 const postController = require("../controllers/postController");
 const { protect } = require("../middlewares/authMiddleware");
-const bodyValidator = require("../middlewares/bodyValidator");
+const requestValidator = require("../middlewares/requestValidator");
 
 router.get("/", postController.getPosts);
 
 router.get("/me", protect, postController.getMyPosts);
 
+router.get("/favorites", protect, postController.getFavoritePosts);
+
 router.get("/:id", postController.getPost);
 
 router.post(
   "/bulk",
-  bodyValidator("createPostBulk"),
+  requestValidator("createPostBulk"),
   postController.createPostBulk
 );
 
 router.post(
   "/",
   protect,
-  bodyValidator("createPost"),
+  requestValidator("createPost"),
   postController.createPost
 );
 
 router.patch(
   "/:id",
   protect,
-  bodyValidator("updatePost"),
+  requestValidator("updatePost"),
   postController.updatePost
 );
 

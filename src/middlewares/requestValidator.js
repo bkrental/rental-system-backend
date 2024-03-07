@@ -2,10 +2,10 @@ const ajv = require("../schemas");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
-function bodyValidator(schema_name) {
+function requestValidator(schema_name, validateItem = "body") {
   return catchAsync(async (req, res, next) => {
     const validate = ajv.getSchema(schema_name);
-    const valid = validate(req.body);
+    const valid = validate(req[validateItem]);
 
     if (!valid) {
       throw new AppError(ajv.errorsText(validate.errors), 400);
@@ -15,4 +15,4 @@ function bodyValidator(schema_name) {
   });
 }
 
-module.exports = bodyValidator;
+module.exports = requestValidator;
