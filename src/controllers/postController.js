@@ -1,5 +1,6 @@
 const _ = require("lodash");
 const Post = require("../models/post");
+const User = require("../models/user");
 const postService = require("../services/postService");
 const AppError = require("../utils/appError");
 const wrapper = require("../utils/wrapper");
@@ -19,6 +20,16 @@ const postController = {
     const posts = await postService.getPosts(req.query, { owner: userId });
 
     sendResponse(res, { length: posts.length, posts }, 200);
+  },
+
+  getFavoritePosts: async (req, res) => {
+    const userId = req.user.id;
+
+    const { favourites: favIdLists } = await User.findById(userId).select("favourites");
+
+    const favPosts = await postService.getPosts(req.query, { _id: { $in: favIdLists } });
+
+    sendResponse(res, { length: favPosts.length, posts: favPosts }, 200);
   },
 
   getPosts: async (req, res) => {
@@ -80,6 +91,41 @@ const postController = {
 
     sendResponse(res, {}, 204);
   },
-};
 
+  addFavorite: async (req, res) => {
+    const userId = req.user.id;
+    const postId = req.body.id;
+
+    const user = await User.findById(userId);
+
+    if (user.favourites.includes(postId)) {
+      throw new AppError("Post already in favorites", 400);
+    }
+
+    user.favourites.push(postId);
+    await user.save();
+
+    const favPosts = await postService.getPosts({}, { _id: { $in: user.favourites } });
+
+    sendResponse(res, { length: favPosts.length, posts: favPosts }, 200);
+  },
+
+  removeFavorite: async (req, res) => {
+    const userId = req.user.id;
+    const postId = req.query.id;
+
+    const user = await User.findById(userId);
+
+    if (!user.favourites.includes(postId)) {
+      throw new AppError("Post not in favorites", 400);
+    }
+
+    user.favourites.pull(postId);
+    await user.save();
+
+    const favPosts = await postService.getPosts({}, { _id: { $in: user.favourites } });
+
+    sendResponse(res, { length: favPosts.length, posts: favPosts }, 200);
+  },
+};
 module.exports = wrapper(postController);
