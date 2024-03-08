@@ -122,7 +122,6 @@ const postController = {
 
     user.favourites.pull(postId);
     await user.save();
-    console.log("user fav after post", user.favourites);
 
     const favPosts = await postService.getPosts({}, { _id: { $in: user.favourites } });
 
