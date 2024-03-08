@@ -7,7 +7,11 @@ router.get("/", postController.getPosts);
 
 router.get("/me", protect, postController.getMyPosts);
 
-router.get("/favorites", protect, postController.getFavoritePosts);
+router.get("/favourites", protect, postController.getFavoritePosts);
+
+router.post("/favourites", protect, postController.addFavorite);
+
+router.delete("/favourites", protect, postController.removeFavorite);
 
 router.get("/:id", postController.getPost);
 
