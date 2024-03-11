@@ -30,10 +30,9 @@ const userController = {
     const user = await User.findById(userId).select("+password");
 
     user.password = password;
-    await user.save();
+    const {password, ...rest} = await user.save();
 
-    const updatedUser = await User.findById(userId).select("-password");
-    sendResponse(res, { updatedUser }, 200);
+    sendResponse(res, { user: rest}, 200);
   },
 }
 
