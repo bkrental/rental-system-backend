@@ -23,15 +23,13 @@ const updateUserInfoSchema = {
 const updateUserPasswordSchema = {
   type: 'object',
   properties: {
-    password: { type: 'string' },
+    currentPassword: { type: 'string' },
+    newPassword: { type: 'string' },
   },
-  required: ['password'],
+  required: ['currentPassword', 'newPassword'],
   additionalProperties: false,
   errorMessage: {
-    required: {
-      newPassword: 'New password is required',
-    },
-    additionalProperties: 'Additional properties are not allowed - Can only update "password" field',
+    additionalProperties: 'Additional properties are not allowed',
   }
 }
 

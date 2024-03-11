@@ -25,15 +25,18 @@ const userController = {
   },
 
   updateUserPassword: async (req, res) => {
-    const { password } = req.body;
+    const { currentPassword, newPassword } = req.body;
     const userId = req.user.id;
     const user = await User.findById(userId).select("+password");
 
-    user.password = password;
-    await user.save();
+    if (!user.comparePassword(currentPassword)) {
+      throw new AppError("Current password is incorrect", 400);
+    }
 
-    const updatedUser = await User.findById(userId).select("-password");
-    sendResponse(res, { updatedUser }, 200);
+    user.password = newPassword;
+    const { password, ...rest } = _.get(await user.save(), '_doc');
+
+    sendResponse(res, { user: rest }, 200);
   },
 }
 
