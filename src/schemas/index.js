@@ -1,6 +1,7 @@
 const fs = require("fs");
 const Ajv = require("ajv");
-const ajv = new Ajv();
+const ajv = new Ajv({ allErrors: true });
+require("ajv-errors")(ajv);
 
 const removeSchemaPostfix = (key) =>
   key.endsWith("Schema") ? key.slice(0, -6) : key;
