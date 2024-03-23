@@ -1704,7 +1704,7 @@ __metadata:
     helmet: ^7.1.0
     jsonwebtoken: ^9.0.2
     lodash: ^4.17.21
-    mongoose: ^8.1.0
+    mongoose: ^8.2.0
     morgan: ^1.10.0
     multer: ^1.4.5-lts.1
     nodemon: ^3.0.3
@@ -2605,7 +2605,7 @@ __metadata:
 
 "fsevents@patch:fsevents@~2.3.2#~builtin<compat/fsevents>":
   version: 2.3.3
-  resolution: "fsevents@patch:fsevents@npm%3A2.3.3#~builtin<compat/fsevents>::version=2.3.3&hash=df0bf1"
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.3#~builtin<compat/fsevents>::version=2.3.3&hash=18f3a7"
   dependencies:
     node-gyp: latest
   conditions: os=darwin
@@ -3461,9 +3461,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongoose@npm:^8.1.0":
-  version: 8.2.1
-  resolution: "mongoose@npm:8.2.1"
+"mongoose@npm:^8.2.0":
+  version: 8.2.3
+  resolution: "mongoose@npm:8.2.3"
   dependencies:
     bson: ^6.2.0
     kareem: 2.5.1
@@ -3472,7 +3472,7 @@ __metadata:
     mquery: 5.0.0
     ms: 2.1.3
     sift: 16.0.1
-  checksum: e3e83fca5d141a52567a60f154773b96fad469209ad4a9bcb42671b99b2626c1e3cb67447cf5fa85d293ed6ab3bc89127166007895b0613f0911f7ceb920a41e
+  checksum: 0f79e08f377b1ad171f6a7573efe1d3df7550b397d61a70fb510fce62c46c3ce91a4ce83323945cb02347746f4d0b80eb613355635bf46cc3eee5e7688c27389
   languageName: node
   linkType: hard
 
@@ -4179,7 +4179,7 @@ __metadata:
 
 "resolve@patch:resolve@^1.22.1#~builtin<compat/resolve>":
   version: 1.22.8
-  resolution: "resolve@patch:resolve@npm%3A1.22.8#~builtin<compat/resolve>::version=1.22.8&hash=c3c19d"
+  resolution: "resolve@patch:resolve@npm%3A1.22.8#~builtin<compat/resolve>::version=1.22.8&hash=07638b"
   dependencies:
     is-core-module: ^2.13.0
     path-parse: ^1.0.7
