@@ -7,7 +7,11 @@ const helmet = require("helmet");
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 const db = require("./config/database");
-const { jwtStrategy, protect } = require("./middlewares/authMiddleware");
+const {
+  jwtStrategy,
+  protect,
+  decodeToken,
+} = require("./middlewares/authMiddleware");
 const errorHandler = require("./controllers/errorController");
 
 const app = express();
@@ -21,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(passport.initialize());
 passport.use(jwtStrategy);
+app.use(decodeToken);
 
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/posts", require("./routes/postRoutes"));
