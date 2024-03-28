@@ -25,22 +25,37 @@ const postController = {
   getFavoritePosts: async (req, res) => {
     const userId = req.user.id;
 
-    const { favourites: favIdLists } = await User.findById(userId).select("favourites");
+    const { favourites: favIdLists } = await User.findById(userId).select(
+      "favourites"
+    );
 
-    const favPosts = await postService.getPosts(req.query, { _id: { $in: favIdLists } });
+    const favPosts = await postService.getPosts(req.query, {
+      _id: { $in: favIdLists },
+    });
 
     sendResponse(res, { length: favPosts.length, posts: favPosts }, 200);
   },
 
   getPosts: async (req, res) => {
     const queryObj = {
-      ...(_.omit(req.query, ["center", "distance", "unit"])),
-      ...getLocationQueryObj(req.query)
-    }
+      ..._.omit(req.query, ["center", "distance", "unit"]),
+      ...getLocationQueryObj(req.query),
+    };
 
     const posts = await postService.getPosts(queryObj);
+    const postsWithFavouriteField = await postService.addFavouriteField(
+      posts,
+      req?.user?.id
+    );
 
-    sendResponse(res, { length: posts.length, posts: posts }, 200);
+    sendResponse(
+      res,
+      {
+        length: postsWithFavouriteField.length,
+        posts: postsWithFavouriteField,
+      },
+      200
+    );
   },
 
   createPost: async (req, res) => {
@@ -105,7 +120,10 @@ const postController = {
     user.favourites.push(postId);
     await user.save();
 
-    const favPosts = await postService.getPosts({}, { _id: { $in: user.favourites } });
+    const favPosts = await postService.getPosts(
+      {},
+      { _id: { $in: user.favourites } }
+    );
 
     sendResponse(res, { length: favPosts.length, posts: favPosts }, 200);
   },
@@ -123,7 +141,10 @@ const postController = {
     user.favourites.pull(postId);
     await user.save();
 
-    const favPosts = await postService.getPosts({}, { _id: { $in: user.favourites } });
+    const favPosts = await postService.getPosts(
+      {},
+      { _id: { $in: user.favourites } }
+    );
 
     sendResponse(res, { length: favPosts.length, posts: favPosts }, 200);
   },
