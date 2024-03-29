@@ -2,6 +2,7 @@ const _ = require("lodash");
 const Post = require("../models/post");
 const User = require("../models/user");
 const postService = require("../services/postService");
+const QueueService = require("../services/queueService");
 const AppError = require("../utils/appError");
 const wrapper = require("../utils/wrapper");
 const getLocationQueryObj = require("../utils/getLocationQueryObj");
@@ -62,6 +63,18 @@ const postController = {
     const userId = req.user.id;
 
     const post = await Post.create(Object.assign(req.body, { owner: userId }));
+    const queueService = await QueueService.getInstance();
+
+    const user = await User.findById(userId)
+    const msg = {
+      userName: user.name,
+      postId: post._id,
+      postTitle: post.name,
+      template: "postCreated",
+      userEmail: "nguyenphuoclhp2508@gmail.com",
+    };
+
+    await queueService.publishMsg("notification", msg);
 
     sendResponse(res, { post }, 201);
   },
