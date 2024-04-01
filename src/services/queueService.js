@@ -41,7 +41,7 @@ class QueueService {
       throw new Error('Channel is not initialized');
     }
 
-    this.channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)));
+    this.channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)), { expiration: 5000 });
 
     console.log(`Sent to queue: ${queueName}`);
   }

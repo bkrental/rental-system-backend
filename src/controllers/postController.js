@@ -7,6 +7,8 @@ const AppError = require("../utils/appError");
 const wrapper = require("../utils/wrapper");
 const getLocationQueryObj = require("../utils/getLocationQueryObj");
 const sendResponse = require("../utils/sendResponse");
+const { NOTIFICATION_TEMPLATES } = require("../config/constants");
+
 
 const postController = {
   getPost: async (req, res) => {
@@ -63,18 +65,21 @@ const postController = {
     const userId = req.user.id;
 
     const post = await Post.create(Object.assign(req.body, { owner: userId }));
-    const queueService = await QueueService.getInstance();
+    const user = await User.findById(userId).select("+email");
 
-    const user = await User.findById(userId)
-    const msg = {
-      userName: user.name,
-      postId: post._id,
-      postTitle: post.name,
-      template: "postCreated",
-      userEmail: "nguyenphuoclhp2508@gmail.com",
-    };
+    if (user.email) {
+      const queueService = await QueueService.getInstance();
+      const msg = {
+        userName: user.name,
+        postId: post._id,
+        postTitle: post.name,
+        template: NOTIFICATION_TEMPLATES.POST_CREATED,
+        userEmail: user.email,
+      };
 
-    await queueService.publishMsg("notification", msg);
+      await queueService.publishMsg("notification", msg);
+      console.log("Published to queue: notification");
+    }
 
     sendResponse(res, { post }, 201);
   },
@@ -111,11 +116,28 @@ const postController = {
       throw new AppError("Post not found", 404);
     }
 
-    if (post.owner.toString() !== userId) {
+    if (post.owner._id.toString() !== userId) {
       throw new AppError("You are not authorized to update this post", 403);
     }
 
     await post.deleteOne();
+
+    const user = await User.findById(userId);
+
+    if (user.email) {
+      console.log("user:", user);
+      const queueService = await QueueService.getInstance();
+
+      const msg = {
+        userName: user.name,
+        postTitle: post.name,
+        template: NOTIFICATION_TEMPLATES.POST_DELETED,
+        userEmail: user.email,
+      };
+
+      await queueService.publishMsg("notification", msg);
+    }
+
 
     sendResponse(res, {}, 204);
   },
