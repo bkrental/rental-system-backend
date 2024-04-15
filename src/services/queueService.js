@@ -16,9 +16,19 @@ class QueueService {
 
     try {
       queueNames.forEach((queueName) => {
-        channel.assertQueue(queueName, {
-          durable: true,
-        });
+        let option = {}
+        if (queueName === 'notification') {
+          option = {
+            durable: true,
+            arguments: { "x-dead-letter-exchange": "notification_dlx" }
+          }
+        } else {
+          option = {
+            durable: true,
+          }
+        }
+
+        channel.assertQueue(queueName, option);
       });
     } catch (error) {
       console.log('Error initializing queue service', error);
