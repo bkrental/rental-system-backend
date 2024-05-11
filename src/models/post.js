@@ -54,6 +54,11 @@ const postSchema = new mongoose.Schema({
     },
   },
 
+  displayed_address: {
+    type: String,
+    required: true,
+  },
+
   location: {
     type: {
       type: String,
@@ -91,6 +96,8 @@ const postSchema = new mongoose.Schema({
     default: "internal",
   },
 });
+
+postSchema.index({ location: "2dsphere" });
 
 // Populate owner field
 postSchema.pre(/^find/, function (next) {

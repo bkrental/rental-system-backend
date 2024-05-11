@@ -37,6 +37,7 @@ const postSchema = {
     property_type: { type: "string" },
     transaction_type: { type: "string", enum: ["rent", "sale"] },
     price: { type: "number" },
+    displayed_address: { type: "string" },
     address: addressSchema,
     location: locationSchema,
     thumbnail: { type: "string" },
@@ -63,6 +64,7 @@ const createPostSchema = {
     "price",
     "address",
     "thumbnail",
+    "displayed_address",
   ],
   additionalProperties: false,
 };
