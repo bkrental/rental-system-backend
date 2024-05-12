@@ -37,31 +37,12 @@ const postController = {
   },
 
   getPosts: async (req, res) => {
-    const queryObj = {
-      ..._.omit(req.query, ["center", "distance", "unit"]),
-      ...getLocationQueryObj(req.query),
-    };
-
-    const page = req.query?.page || 1;
-    const limit = req.query?.limit || 10;
-
-    console.log(queryObj);
-
-    const { posts, totalRecords } = await postService.getPosts({
-      ...queryObj,
-      page,
-      limit,
-    });
+    const { posts, metadata } = await postService.getPosts(req.query);
 
     res.status(200).json({
       status: "success",
       data: posts,
-      pagination: {
-        current_page: page,
-        page_size: limit,
-        total_records: totalRecords,
-        total_pages: Math.ceil(totalRecords / limit),
-      },
+      pagination: metadata,
     });
   },
 
