@@ -40,25 +40,13 @@ const postController = {
   },
 
   getPosts: async (req, res) => {
-    const queryObj = {
-      ..._.omit(req.query, ["center", "distance", "unit"]),
-      ...getLocationQueryObj(req.query),
-    };
+    const { posts, metadata } = await postService.getPosts(req.query);
 
-    const posts = await postService.getPosts(queryObj);
-    const postsWithFavouriteField = await postService.addFavouriteField(
-      posts,
-      req?.user?.id
-    );
-
-    sendResponse(
-      res,
-      {
-        length: postsWithFavouriteField.length,
-        posts: postsWithFavouriteField,
-      },
-      200
-    );
+    res.status(200).json({
+      status: "success",
+      data: posts,
+      pagination: metadata,
+    });
   },
 
   createPost: async (req, res) => {

@@ -1731,10 +1731,11 @@ __metadata:
     mongoose: ^8.1.0
     morgan: ^1.10.0
     multer: ^1.4.5-lts.1
-    nodemon: ^3.0.3
+    nodemon: ^3.1.0
     passport: ^0.7.0
     passport-jwt: ^4.0.1
     pm2: ^5.3.1
+    qs: ^6.12.1
     uuid: ^9.0.1
   languageName: unknown
   linkType: soft
@@ -3656,7 +3657,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemon@npm:^3.0.3":
+"nodemon@npm:^3.1.0":
   version: 3.1.0
   resolution: "nodemon@npm:3.1.0"
   dependencies:
@@ -4128,6 +4129,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"qs@npm:^6.12.1":
+  version: 6.12.1
+  resolution: "qs@npm:6.12.1"
+  dependencies:
+    side-channel: ^1.0.6
+  checksum: aa761d99e65b6936ba2dd2187f2d9976afbcda38deb3ff1b3fe331d09b0c578ed79ca2abdde1271164b5be619c521ec7db9b34c23f49a074e5921372d16242d5
+  languageName: node
+  linkType: hard
+
 "range-parser@npm:~1.2.1":
   version: 1.2.1
   resolution: "range-parser@npm:1.2.1"
@@ -4431,7 +4441,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"side-channel@npm:^1.0.4":
+"side-channel@npm:^1.0.4, side-channel@npm:^1.0.6":
   version: 1.0.6
   resolution: "side-channel@npm:1.0.6"
   dependencies:
