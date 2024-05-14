@@ -51,6 +51,8 @@ const postSchema = {
     contact: contactSchema,
     post_url: { type: "string" },
     source: { type: "string" },
+    published_date: { type: "string" },
+    status: { type: "string" },
   },
 };
 
