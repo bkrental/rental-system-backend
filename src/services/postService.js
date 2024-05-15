@@ -17,7 +17,7 @@ const postService = {
   },
 
   getPosts: async (queryObj, filterObj = {}) => {
-    const query = {};
+    const query = { ...filterObj };
     const { bp, tp, ba, ta, pt, transaction } = queryObj;
 
     // Price

@@ -15,7 +15,7 @@ const sendAuthResponse = (res, user) => {
     status: "success",
     data: {
       access_token: generateToken(user),
-      user: _.pick(user, ["name", "phone", "avatar"]),
+      user: _.pick(user, ["id", "name", "phone", "avatar"]),
     },
   });
 };

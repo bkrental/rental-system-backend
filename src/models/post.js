@@ -95,6 +95,17 @@ const postSchema = new mongoose.Schema({
     type: String,
     default: "internal",
   },
+
+  published_date: {
+    type: Date,
+    default: Date.now(),
+  },
+
+  status: {
+    type: String,
+    enum: ["active", "inactive", "draft"],
+    default: "active",
+  },
 });
 
 postSchema.index({ location: "2dsphere" });
