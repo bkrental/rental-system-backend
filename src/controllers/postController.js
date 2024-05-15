@@ -20,9 +20,15 @@ const postController = {
   getMyPosts: async (req, res) => {
     const userId = req.user.id;
 
-    const posts = await postService.getPosts(req.query, { owner: userId });
+    const { posts, metadata } = await postService.getPosts(req.query, {
+      owner: userId,
+    });
 
-    sendResponse(res, { length: posts.length, posts }, 200);
+    res.status(200).json({
+      status: "success",
+      data: posts,
+      pagination: metadata,
+    });
   },
 
   getFavoritePosts: async (req, res) => {
