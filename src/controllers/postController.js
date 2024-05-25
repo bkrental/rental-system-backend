@@ -2,10 +2,13 @@ const _ = require("lodash");
 const Post = require("../models/post");
 const User = require("../models/user");
 const postService = require("../services/postService");
+const QueueService = require("../services/queueService");
 const AppError = require("../utils/appError");
 const wrapper = require("../utils/wrapper");
 const getLocationQueryObj = require("../utils/getLocationQueryObj");
 const sendResponse = require("../utils/sendResponse");
+const { NOTIFICATION_TEMPLATES } = require("../config/constants");
+
 
 const postController = {
   getPost: async (req, res) => {
@@ -56,6 +59,21 @@ const postController = {
     const userId = req.user.id;
 
     const post = await Post.create(Object.assign(req.body, { owner: userId }));
+    const user = await User.findById(userId).select("+email");
+
+    if (user.email) {
+      const queueService = await QueueService.getInstance();
+      const msg = {
+        userName: user.name,
+        postId: post._id,
+        postTitle: post.name,
+        template: NOTIFICATION_TEMPLATES.POST_CREATED,
+        userEmail: user.email,
+      };
+
+      await queueService.publishMsg("email_queue", msg);
+      console.log("Published to queue: email_queue");
+    }
 
     sendResponse(res, { post }, 201);
   },
@@ -97,6 +115,23 @@ const postController = {
     }
 
     await post.deleteOne();
+
+    const user = await User.findById(userId);
+
+    if (user.email) {
+      console.log("user:", user);
+      const queueService = await QueueService.getInstance();
+
+      const msg = {
+        userName: user.name,
+        postTitle: post.name,
+        template: NOTIFICATION_TEMPLATES.POST_DELETED,
+        userEmail: user.email,
+      };
+
+      await queueService.publishMsg("email_queue", msg);
+    }
+
 
     sendResponse(res, {}, 204);
   },
