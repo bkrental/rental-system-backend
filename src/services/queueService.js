@@ -1,6 +1,6 @@
 const amqp = require('amqplib');
 
-const queueNames = ['email', 'sms', 'notification'];
+const queueNames = ['email_queue'];
 
 
 class QueueService {
@@ -16,16 +16,17 @@ class QueueService {
 
     try {
       queueNames.forEach((queueName) => {
-        let option = {}
-        if (queueName === 'notification') {
+        let option = {
+          durable: true
+        }
+        if (queueName === 'email_queue') {
           option = {
-            durable: true,
-            arguments: { "x-dead-letter-exchange": "notification_dlx" }
-          }
-        } else {
-          option = {
-            durable: true,
-          }
+            ...option,
+            arguments: {
+              'x-dead-letter-exchange': 'my_exchange',
+              'x-dead-letter-routing-key': 'delay_queue'
+            }
+          };
         }
 
         channel.assertQueue(queueName, option);
@@ -51,7 +52,7 @@ class QueueService {
       throw new Error('Channel is not initialized');
     }
 
-    this.channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)), { expiration: 5000 });
+    this.channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)));
 
     console.log(`Sent to queue: ${queueName}`);
   }

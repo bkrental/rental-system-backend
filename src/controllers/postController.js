@@ -71,8 +71,8 @@ const postController = {
         userEmail: user.email,
       };
 
-      await queueService.publishMsg("notification", msg);
-      console.log("Published to queue: notification");
+      await queueService.publishMsg("email_queue", msg);
+      console.log("Published to queue: email_queue");
     }
 
     sendResponse(res, { post }, 201);
@@ -129,7 +129,7 @@ const postController = {
         userEmail: user.email,
       };
 
-      await queueService.publishMsg("notification", msg);
+      await queueService.publishMsg("email_queue", msg);
     }
 
 
