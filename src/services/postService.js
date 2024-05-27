@@ -1,8 +1,8 @@
 const Post = require("../models/post");
 const User = require("../models/user");
-const APIFeatures = require("../utils/apiFeatures");
 const getLocationQueryObj = require("../utils/getLocationQueryObj");
-const getRadius = require("../utils/getRadius");
+const polyline = require("@mapbox/polyline");
+const turf = require("@turf/turf");
 
 const postService = {
   addFavouriteField: async (posts, userId) => {
@@ -18,7 +18,7 @@ const postService = {
 
   getPosts: async (queryObj, filterObj = {}) => {
     const query = { ...filterObj };
-    const { bp, tp, ba, ta, pt, transaction } = queryObj;
+    const { bp, tp, ba, ta, pt, transaction, boundary } = queryObj;
 
     // Price
     if (bp || tp) {
@@ -42,12 +42,38 @@ const postService = {
 
     if (transaction) query.transaction_type = transaction;
 
-    const { center, radius = 10, unit = "km" } = queryObj;
+    const { center, radius = 3, unit = "km" } = queryObj;
     if (center && radius) {
       const coordinates = center.split(",").map((coord) => parseFloat(coord));
       console.log(coordinates);
 
       query.location = getLocationQueryObj({ center, distance: radius, unit });
+    }
+
+    if (boundary) {
+      const decodedBoundary = polyline.decode(boundary);
+      const boundaryCoordinates = decodedBoundary.map((coord) =>
+        coord.reverse()
+      );
+      boundaryCoordinates.push(boundaryCoordinates[0]);
+
+      const initialPolygon = turf.polygon([boundaryCoordinates]);
+      const kinks = turf.kinks(initialPolygon);
+
+      let validPolygon = initialPolygon;
+
+      if (kinks.features.length > 0) {
+        validPolygon = turf.convex(initialPolygon);
+      }
+
+      query.location = {
+        $geoWithin: {
+          $geometry: {
+            type: "Polygon",
+            coordinates: validPolygon.geometry.coordinates,
+          },
+        },
+      };
     }
 
     // Pagination
@@ -57,6 +83,7 @@ const postService = {
 
     const posts = await Post.find(query).skip(skip).limit(limit);
     const totalRecords = await Post.countDocuments(query);
+
     const metadata = {
       current_page: page,
       page_size: limit,
