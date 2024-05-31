@@ -9,7 +9,6 @@ const getLocationQueryObj = require("../utils/getLocationQueryObj");
 const sendResponse = require("../utils/sendResponse");
 const { NOTIFICATION_TEMPLATES } = require("../config/constants");
 
-
 const postController = {
   getPost: async (req, res) => {
     const post = await Post.findById(req.params.id);
@@ -34,18 +33,25 @@ const postController = {
   getFavoritePosts: async (req, res) => {
     const userId = req.user.id;
 
-    const { favourites: favIdLists } = await User.findById(userId).select(
-      "favourites"
-    );
+    const { favourites } = await User.findById(userId).select("favourites");
 
-    const favPosts = await postService.getPosts(req.query, {
-      _id: { $in: favIdLists },
+    const { posts, metadata } = await postService.getPosts(req.query, {
+      _id: { $in: favourites },
     });
 
-    sendResponse(res, { length: favPosts.length, posts: favPosts }, 200);
+    res.status(200).json({
+      status: "success",
+      data: posts,
+      pagination: metadata,
+    });
   },
 
   getPosts: async (req, res) => {
+    // Pass the userId to req.query to check if the post is in favorites
+    if (req?.user && req.user.id) {
+      req.query.userId = req.user.id;
+    }
+
     const { posts, metadata } = await postService.getPosts(req.query);
 
     res.status(200).json({
@@ -132,13 +138,14 @@ const postController = {
       await queueService.publishMsg("email_queue", msg);
     }
 
-
     sendResponse(res, {}, 204);
   },
 
   addFavorite: async (req, res) => {
     const userId = req.user.id;
-    const postId = req.body.id;
+    const postId = req.params.id;
+
+    console.log(postId);
 
     const user = await User.findById(userId);
 
@@ -159,7 +166,7 @@ const postController = {
 
   removeFavorite: async (req, res) => {
     const userId = req.user.id;
-    const postId = req.query.id;
+    const postId = req.params.id;
 
     const user = await User.findById(userId);
 
