@@ -31,6 +31,7 @@ app.use("/auth", require("./routes/authRoutes"));
 app.use("/posts", require("./routes/postRoutes"));
 app.use("/images", require("./routes/imageRoutes"));
 app.use("/users", require("./routes/userRoutes"));
+app.use("/messages", require("./routes/messageRoutes"));
 
 app.get("/", protect, (req, res) => {
   res.send("Hello World!!");
