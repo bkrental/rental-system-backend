@@ -9,9 +9,10 @@ router.get("/me", protect, postController.getMyPosts);
 
 router.get("/favourites", protect, postController.getFavoritePosts);
 
-router.post("/favourites", protect, postController.addFavorite);
+// router.post("/favourites", protect, postController.addFavorite);
+router.post("/:id/favourites", protect, postController.addFavorite);
 
-router.delete("/favourites", protect, postController.removeFavorite);
+router.delete("/:id/favourites", protect, postController.removeFavorite);
 
 router.get("/:id", postController.getPost);
 

@@ -18,7 +18,7 @@ const postService = {
 
   getPosts: async (queryObj, filterObj = {}) => {
     const query = { ...filterObj };
-    const { bp, tp, ba, ta, pt, transaction, boundary } = queryObj;
+    const { bp, tp, ba, ta, pt, transaction, boundary, userId } = queryObj;
 
     // Price
     if (bp || tp) {
@@ -81,8 +81,11 @@ const postService = {
     const limit = queryObj?.limit || 10;
     const skip = (page - 1) * limit;
 
-    const posts = await Post.find(query).skip(skip).limit(limit);
+    let posts = await Post.find(query).skip(skip).limit(limit);
     const totalRecords = await Post.countDocuments(query);
+
+    // Add isFavourite field to posts
+    posts = await postService.addFavouriteField(posts, userId);
 
     const metadata = {
       current_page: page,
